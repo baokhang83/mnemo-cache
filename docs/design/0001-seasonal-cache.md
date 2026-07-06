@@ -136,6 +136,11 @@ DURATION := INT ('s' | 'm')             ; e.g. 60s, 5m
 ZONE     := IANA zone id                ; e.g. Europe/Vienna
 ```
 
+**Zone required.** Although `zone=` is bracketed optional in the grammar above, it is
+semantically **required**: a missing zone **fails fast**, never silently defaults to the
+system zone (see the explicit-`ZoneId` decision). Treat the optional bracket as syntax
+only.
+
 **Wrap rule:** the curve must start with an anchor; every following segment moves forward
 in time. The **last segment's value holds until it wraps around to the first anchor**, so
 midnight need not be restated.
