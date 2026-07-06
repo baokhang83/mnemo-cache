@@ -56,6 +56,11 @@ The curve is `plateau → ramp → plateau → ramp`: each segment either **hold
 level flat or **ramps** linearly to a new one. Ramping is the default because it spreads
 eviction smoothly as capacity shrinks.
 
+> **Sizing is by entry count.** `max` and `min` are **numbers of cached entries** — the same
+> unit as Caffeine's `maximumSize`, not bytes. The percentages on the curve scale the entry
+> ceiling between `min` and `max` (e.g. `max=100000` at `85%` → 85 000 entries, never below
+> `min`). Weight- or byte-based sizing is out of scope for v1.
+
 **Programmatically:**
 
 ```java
@@ -71,15 +76,24 @@ ScheduleSpec spec = SeasonalCapacity.named("hotItems")
     .build();
 ```
 
-**Or as a string** — for tuning per environment without a redeploy, via a VM argument or
-environment variable:
+**Or as a string** — the same grammar on a single line, for tuning per environment without a
+redeploy. Supply it as either a **JVM system property** or an **environment variable**:
 
-```
+```bash
+# JVM system property — key: mnemo.cache.<name>.schedule
 -Dmnemo.cache.hotItems.schedule="zone=Europe/Vienna; max=100000; min=500; tick=60s; \
+   curve=00:00@10, hold 06:00, ramp 11:00@85, hold 20:00, ramp 23:00@10"
+
+# Environment variable — key: MNEMO_CACHE_<NAME>_SCHEDULE
+export MNEMO_CACHE_HOTITEMS_SCHEDULE="zone=Europe/Vienna; max=100000; min=500; tick=60s; \
    curve=00:00@10, hold 06:00, ramp 11:00@85, hold 20:00, ramp 23:00@10"
 ```
 
-The verbs match: `hold`↔`holdUntil`, `ramp`↔`rampUntil`, `@`↔`percent()`.
+The env-var key is the cache name **upper-cased, with any non-alphanumeric character replaced
+by `_`**, wrapped as `MNEMO_CACHE_<NAME>_SCHEDULE` — so `hotItems` becomes
+`MNEMO_CACHE_HOTITEMS_SCHEDULE`.
+
+The verbs match the builder: `hold`↔`holdUntil`, `ramp`↔`rampUntil`, `@`↔`percent()`.
 
 **Resolution precedence** is **system property → environment variable → programmatic**, so
 external config always overrides code:
