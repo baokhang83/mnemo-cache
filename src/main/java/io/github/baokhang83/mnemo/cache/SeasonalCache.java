@@ -14,10 +14,10 @@ import java.util.function.Function;
  * off-peak. A single background thread samples the curve every {@link ScheduleSpec#tick()}
  * and adjusts the backend's maximum; eviction itself is delegated to the backend.
  *
- * <p>Construct with {@link #start(ScheduleSpec)}. Always {@link #close()} it (or use
- * try-with-resources) to stop the scheduler.
+ * <p>Construct with {@link #start(ScheduleSpec)}. Call {@link #shutdown()} to stop the
+ * background scheduler when the cache is no longer needed.
  */
-public final class SeasonalCache<K, V> implements AutoCloseable {
+public final class SeasonalCache<K, V> {
 
     private final ScheduleSpec spec;
     private final Clock clock;
@@ -74,8 +74,8 @@ public final class SeasonalCache<K, V> implements AutoCloseable {
                 backend.evictionCount());
     }
 
-    @Override
-    public void close() {
+    /** Stop the background scheduler. Idempotent; safe to call more than once. */
+    public void shutdown() {
         ScheduledExecutorService current = scheduler;
         if (current != null) {
             current.shutdownNow();

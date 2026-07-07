@@ -2,8 +2,6 @@
   <img src="mnemo-cache.png" alt="mnemo-cache" width="100%" />
 </p>
 
-# mnemo-cache
-
 [![build](https://github.com/baokhang83/mnemo-cache/actions/workflows/build.yml/badge.svg)](https://github.com/baokhang83/mnemo-cache/actions/workflows/build.yml)
 
 A **seasonality-aware cache** for the JVM whose maximum capacity flexes on a daily
@@ -108,18 +106,21 @@ falls back to "no seasonality".
 ### Use the cache
 
 ```java
-try (SeasonalCache<String, byte[]> cache = SeasonalCache.start(effective)) {
-    cache.put("k", value);
-    byte[] hit = cache.getIfPresent("k");
-    byte[] loaded = cache.get("k2", key -> expensiveLoad(key)); // get-or-compute
+SeasonalCache<String, byte[]> cache = SeasonalCache.start(effective);
 
-    SeasonalCacheState s = cache.state();
-    // s.currentFraction(), s.currentMaxEntries(), s.size(), s.evictionCount()
-}
+cache.put("k", value);
+byte[] hit = cache.getIfPresent("k");
+byte[] loaded = cache.get("k2", key -> expensiveLoad(key)); // get-or-compute
+
+SeasonalCacheState s = cache.state();
+// s.currentFraction(), s.currentMaxEntries(), s.size(), s.evictionCount()
+
+cache.shutdown(); // stops the background scheduler
 ```
 
 A single daemon thread samples the curve every `tick` and adjusts the backend's maximum.
-Always `close()` the cache (try-with-resources) to stop it.
+Call `shutdown()` when the cache is no longer needed. It's typically a long-lived singleton
+— in Spring, expose it as a `@Bean(destroyMethod = "shutdown")` so it stops with the context.
 
 ### ⚠️ Note on reclaiming memory
 

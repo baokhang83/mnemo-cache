@@ -33,10 +33,9 @@ class CapacityScalingTest {
 
     @Test
     void appliesInitialCapacityOnConstructionForCurrentTime() {
-        try (SeasonalCache<String, String> cache =
-                     SeasonalCache.withoutScheduler(fullDay100k(), clockAt(LocalTime.of(3, 0)))) {
-            assertEquals(10_000, cache.state().currentMaxEntries());
-            assertEquals(0.10, cache.state().currentFraction(), EPS);
-        }
+        SeasonalCache<String, String> cache =
+                SeasonalCache.withoutScheduler(fullDay100k(), clockAt(LocalTime.of(3, 0)));
+        assertEquals(10_000, cache.state().currentMaxEntries());
+        assertEquals(0.10, cache.state().currentFraction(), EPS);
     }
 }

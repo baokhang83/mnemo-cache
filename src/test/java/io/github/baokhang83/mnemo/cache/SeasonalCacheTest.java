@@ -14,37 +14,37 @@ class SeasonalCacheTest {
 
     @Test
     void storesRetrievesAndInvalidates() {
-        try (SeasonalCache<String, String> cache = noonCache()) {
-            cache.put("a", "1");
-            assertEquals("1", cache.getIfPresent("a"));
-            assertNull(cache.getIfPresent("missing"));
-            cache.invalidate("a");
-            assertNull(cache.getIfPresent("a"));
-        }
+        SeasonalCache<String, String> cache = noonCache();
+        cache.put("a", "1");
+        assertEquals("1", cache.getIfPresent("a"));
+        assertNull(cache.getIfPresent("missing"));
+        cache.invalidate("a");
+        assertNull(cache.getIfPresent("a"));
     }
 
     @Test
     void getComputesAndCachesViaLoader() {
-        try (SeasonalCache<String, String> cache = noonCache()) {
-            assertEquals("computed", cache.get("k", key -> "computed"));
-            assertEquals("computed", cache.getIfPresent("k")); // cached; loader not re-run
-        }
+        SeasonalCache<String, String> cache = noonCache();
+        assertEquals("computed", cache.get("k", key -> "computed"));
+        assertEquals("computed", cache.getIfPresent("k")); // cached; loader not re-run
     }
 
     @Test
     void stateReportsCurrentFraction() {
-        try (SeasonalCache<String, String> cache = noonCache()) {
-            assertEquals(0.85, cache.state().currentFraction(), EPS); // daytime plateau at noon
-        }
+        SeasonalCache<String, String> cache = noonCache();
+        assertEquals(0.85, cache.state().currentFraction(), EPS); // daytime plateau at noon
     }
 
     @Test
-    void startProducesAWorkingCacheAndCloseIsIdempotent() {
+    void startProducesAWorkingCacheAndShutdownIsIdempotent() {
         SeasonalCache<String, String> cache = SeasonalCache.start(fullDay100k());
-        cache.put("a", "1");
-        assertEquals("1", cache.getIfPresent("a"));
-        cache.close();
-        cache.close(); // idempotent
+        try {
+            cache.put("a", "1");
+            assertEquals("1", cache.getIfPresent("a"));
+        } finally {
+            cache.shutdown();
+            cache.shutdown(); // idempotent
+        }
     }
 
     private static SeasonalCache<String, String> noonCache() {
