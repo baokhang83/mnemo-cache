@@ -4,7 +4,7 @@
 
 [![build](https://github.com/baokhang83/mnemo-cache/actions/workflows/build.yml/badge.svg)](https://github.com/baokhang83/mnemo-cache/actions/workflows/build.yml)
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.baokhang83.mnemo/mnemo-cache.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.baokhang83.mnemo/mnemo-cache)
-![Coverage](.github/badges/jacoco.svg)](https://github.com/baokhang83/mnemo-cache/actions/workflows/build.yml)
+[![Test Coverage](https://cdn.hackernoon.com/images/2hVuiN1gfbdO9OXUxjCttPNETq73-2022-08-08T22:19:48.257Z-cl6lbgrz6002p0as65v8sfgja)](https://github.com/baokhang83/mnemo-cache/)
 
 A **seasonality-aware cache** for the JVM whose maximum capacity flexes on a daily
 time-of-day curve, to reclaim memory off-peak. Lean, dependency-light, Java 21.
