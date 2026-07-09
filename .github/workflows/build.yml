@@ -24,7 +24,7 @@ jobs:
           cache: maven
 
       - name: Build and test
-        run: mvn -B --no-transfer-progress verify
+        run: mvn -B --no-transfer-progress surefire-report:report verify
         
       - name: Generate JaCoCo Badge
         uses: cicirello/jacoco-badge-generator@v2
