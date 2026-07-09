@@ -25,3 +25,9 @@ jobs:
 
       - name: Build and test
         run: mvn -B --no-transfer-progress verify
+        
+      - name: Generate JaCoCo Badge
+        uses: cicirello/jacoco-badge-generator@v2
+        with:
+          jacoco-csv-file: build/reports/jacoco/test/jacocoTestReport.csv
+          badges-directory: build/reports/jacoco/test/html/badges
